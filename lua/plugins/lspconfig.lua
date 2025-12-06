@@ -4,6 +4,7 @@ return {
   opts = {
     ---@type lspconfig.options
     servers = {
+      elixirls = {},
       pyright = {
         python = {
           pythonPath = "./.venv/bin/python",

@@ -8,6 +8,8 @@ return {
       "json",
       "json5",
       "lua",
+      "elixir",
+      "erlang",
       "markdown",
       "markdown_inline",
       "python",

@@ -1,4 +1,3 @@
-local action_layout = require("telescope.actions.layout")
 return {
   "nvim-telescope/telescope.nvim",
   keys = {
@@ -17,14 +16,14 @@ return {
       layout_config = { prompt_position = "top" },
       sorting_strategy = "ascending",
       winblend = 0,
-      mappings = {
-        n = {
-          ["<M-p>"] = action_layout.toggle_preview,
-        },
-        i = {
-          ["<M-p>"] = action_layout.toggle_preview,
-        },
-      },
+      -- mappings = {
+      --   n = {
+      --     ["<M-p>"] = action_layout.toggle_preview,
+      --   },
+      --   i = {
+      --     ["<M-p>"] = action_layout.toggle_preview,
+      --   },
+      -- },
     },
   },
 }
