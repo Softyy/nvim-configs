@@ -3,6 +3,18 @@
 -- Add any additional keymaps here
 local map = vim.keymap.set
 
-map("n", "<leader>fw", ":write<CR>:source<CR>", { desc = "Write and source" })
-map("n", "<leader>t", ":15new<CR>:term<CR>", { desc = "Open a terminal" })
-map("n", "<leader>h", ":CodeCompanionChat<CR>", { desc = "Opens Code Companion Chat" })
+local n = "n"
+
+-- dap stuff
+map(n, "<leader>dk", function()
+  require("dap").continue()
+end, { desc = "Start/Continue Debugging" })
+map(n, "<leader>dl", function()
+  require("dap").run_last()
+end, { desc = "Run Last Debugging Session" })
+map(n, "<leader>db", function()
+  require("dap").toggle_breakpoint()
+end, { desc = "Toggle Breakpoint" })
+
+map(n, "<leader>fw", ":write<CR>:source<CR>", { desc = "Write and source" })
+map(n, "<leader>h", ":CodeCompanionChat<CR>", { desc = "Opens Code Companion Chat" })
