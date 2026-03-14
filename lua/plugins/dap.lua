@@ -1,56 +1,160 @@
 return {
   "mfussenegger/nvim-dap",
   dependencies = {
+    "mason-org/mason.nvim",
+    "jay-babu/mason-nvim-dap.nvim",
     "leoluz/nvim-dap-go",
+    "mfussenegger/nvim-dap-python",
+    "mxsdev/nvim-dap-vscode-js",
+    {
+      "microsoft/vscode-js-debug",
+      version = "1.x",
+      build = "npm install --legacy-peer-deps && npm run build",
+    },
     "theHamsta/nvim-dap-virtual-text",
   },
-  opts = {
-    dap_configurations = {
-      {
-        -- Must be "go" or it will be ignored by the plugin
-        type = "go",
-        name = "Attach remote",
-        mode = "remote",
-        request = "attach",
+  config = function()
+    local dap = require("dap")
+
+    require("mason-nvim-dap").setup({
+      automatic_setup = true,
+      ensure_installed = {
+        "delve",
+        "debugpy",
+        "codelldb",
+        "js-debug-adapter",
       },
-    },
-    -- delve configurations
-    delve = {
-      -- the path to the executable dlv which will be used for debugging.
-      -- by default, this is the "dlv" executable on your PATH.
-      path = "dlv",
-      -- time to wait for delve to initialize the debug session.
-      -- default to 20 seconds
-      initialize_timeout_sec = 20,
-      -- a string that defines the port to start delve debugger.
-      -- default to string "${port}" which instructs nvim-dap
-      -- to start the process in a random available port.
-      -- if you set a port in your debug configuration, its value will be
-      -- assigned dynamically.
-      port = "${port}",
-      -- additional args to pass to dlv
-      args = {},
-      -- the build flags that are passed to delve.
-      -- defaults to empty string, but can be used to provide flags
-      -- such as "-tags=unit" to make sure the test suite is
-      -- compiled during debugging, for example.
-      -- passing build flags using args is ineffective, as those are
-      -- ignored by delve in dap mode.
-      -- avaliable ui interactive function to prompt for arguments get_arguments
-      build_flags = {},
-      -- whether the dlv process to be created detached or not. there is
-      -- an issue on delve versions < 1.24.0 for Windows where this needs to be
-      -- set to false, otherwise the dlv server creation will fail.
-      -- avaliable ui interactive function to prompt for build flags: get_build_flags
-      detached = vim.fn.has("win32") == 0,
-      -- the current working directory to run dlv from, if other than
-      -- the current working directory.
-      cwd = nil,
-    },
-    -- options related to running closest test
-    tests = {
-      -- enables verbosity when running the test.
-      verbose = false,
-    },
-  },
+    })
+
+    require("dap-go").setup({
+      dap_configurations = {
+        {
+          type = "go",
+          name = "Attach remote",
+          mode = "remote",
+          request = "attach",
+        },
+      },
+      delve = {
+        path = "dlv",
+        initialize_timeout_sec = 20,
+        port = "${port}",
+        args = {},
+        build_flags = {},
+        detached = vim.fn.has("win32") == 0,
+        cwd = nil,
+      },
+      tests = {
+        verbose = false,
+      },
+    })
+
+    require("dap-python").setup("python")
+    require("nvim-dap-virtual-text").setup()
+
+    require("dap-vscode-js").setup({
+      debugger_path = vim.fn.stdpath("data") .. "/lazy/vscode-js-debug",
+      adapters = {
+        "pwa-node",
+        "pwa-chrome",
+        "pwa-msedge",
+        "node-terminal",
+        "pwa-extensionHost",
+      },
+    })
+
+    dap.adapters.nlua = function(callback, config)
+      callback({
+        type = "server",
+        host = config.host or "127.0.0.1",
+        port = config.port or 8086,
+      })
+    end
+
+    dap.configurations.lua = {
+      {
+        type = "nlua",
+        request = "attach",
+        name = "Attach to running Neovim",
+        host = function()
+          local value = vim.fn.input("Host [127.0.0.1]: ")
+          if value == nil or value == "" then
+            return "127.0.0.1"
+          end
+          return value
+        end,
+        port = function()
+          local value = vim.fn.input("Port: ", "8086")
+          return tonumber(value)
+        end,
+      },
+    }
+
+    dap.configurations.python = {
+      {
+        type = "python",
+        request = "launch",
+        name = "Launch file",
+        program = "${file}",
+        pythonPath = function()
+          local exe = vim.fn.exepath("python3")
+          if exe == nil or exe == "" then
+            return "python"
+          end
+          return exe
+        end,
+      },
+    }
+
+    dap.configurations.javascript = {
+      {
+        type = "pwa-node",
+        request = "launch",
+        name = "Launch file",
+        program = "${file}",
+        cwd = "${workspaceFolder}",
+        sourceMaps = true,
+      },
+      {
+        type = "pwa-node",
+        request = "attach",
+        name = "Attach",
+        processId = require("dap.utils").pick_process,
+        cwd = "${workspaceFolder}",
+      },
+    }
+
+    dap.configurations.typescript = {
+      {
+        type = "pwa-node",
+        request = "launch",
+        name = "Launch file",
+        program = "${file}",
+        cwd = "${workspaceFolder}",
+        sourceMaps = true,
+        outFiles = { "${workspaceFolder}/**/*.js" },
+      },
+      {
+        type = "pwa-node",
+        request = "attach",
+        name = "Attach",
+        processId = require("dap.utils").pick_process,
+        cwd = "${workspaceFolder}",
+      },
+    }
+
+    dap.configurations.rust = {
+      {
+        name = "Launch",
+        type = "codelldb",
+        request = "launch",
+        program = function()
+          return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+        end,
+        cwd = "${workspaceFolder}",
+        stopOnEntry = false,
+        args = {},
+      },
+    }
+  end,
 }

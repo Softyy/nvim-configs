@@ -11,6 +11,7 @@ return {
         },
       },
       zls = {},
+      rust_analyzer = {},
       tsserver = {},
       jsonls = {
         -- lazy-load schemastore when needed
