@@ -5,11 +5,7 @@ return {
     ---@type lspconfig.options
     servers = {
       elixirls = {},
-      pyright = {
-        python = {
-          pythonPath = "./.venv/bin/python",
-        },
-      },
+      basedpyright = {},
       zls = {},
       rust_analyzer = {},
       tsserver = {},
