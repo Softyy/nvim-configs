@@ -4,7 +4,7 @@ return {
 
     formatters_by_ft = {
       lua = { "stylua" },
-      html = { "prettierd" },
+      html = { "prettierd", "prettier", stop_after_first = true },
       css = { "prettierd" },
 
       yaml = { "prettierd" },
