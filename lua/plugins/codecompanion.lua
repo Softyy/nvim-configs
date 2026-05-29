@@ -26,9 +26,10 @@ return {
       ollama = function()
         return require("codecompanion.adapters").extend("ollama", {
           env = {
-            url = "http://localhost:11434",
+            url = "https://ollama.com",
           },
           headers = {
+            ["Authorization"] = "Bearer " .. os.getenv("OLLAMA_API_KEY"),
             ["Content-Type"] = "application/json",
           },
           parameters = {
