@@ -5,7 +5,29 @@ return {
     ---@type lspconfig.options
     servers = {
       elixirls = {},
-      basedpyright = {},
+      pyright = {
+        enabled = false,
+      },
+      basedpyright = {
+        before_init = function(_, config)
+          local path = config.root_dir
+          while path ~= "/" do
+            if vim.fn.isdirectory(path .. "/.venv") == 1 then
+              config.cmd_env = config.cmd_env or {}
+              config.cmd_env.VIRTUAL_ENV = path .. "/.venv"
+              return
+            end
+            path = vim.fn.fnamemodify(path, ":h")
+          end
+        end,
+        settings = {
+          basedpyright = {
+            analysis = {
+              typeCheckingMode = "standard",
+            },
+          },
+        },
+      },
       zls = {},
       rust_analyzer = {},
       tsserver = {},
