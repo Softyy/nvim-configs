@@ -18,6 +18,7 @@ return {
       "tsx",
       "typescript",
       "vim",
+      "vue",
       "yaml",
     },
     highlight = { enabled = true },

@@ -24,6 +24,9 @@ return {
           basedpyright = {
             analysis = {
               typeCheckingMode = "standard",
+              diagnosticSeverityOverrides = {
+                reportUnreachableCode = "none",
+              },
             },
           },
         },
@@ -31,6 +34,7 @@ return {
       zls = {},
       rust_analyzer = {},
       tsserver = {},
+      volar = {},
       jsonls = {
         -- lazy-load schemastore when needed
         on_new_config = function(new_config)
